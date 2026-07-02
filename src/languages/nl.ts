@@ -7316,6 +7316,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 importColumnMerchantContains: 'Handelaar bevat',
                 importColumnUpdatedMerchant: 'Bijgewerkte handelaar',
                 importColumnUpdatedCategory: 'Bijgewerkte categorie',
+                importColumnUpdatedTag: 'Bijgewerkte tag',
                 importColumnUpdatedDescription: 'Bijgewerkte omschrijving',
                 expensesWith: 'Voor declaraties met:',
                 expensesExactlyMatching: 'Voor onkosten die exact overeenkomen met:',

@@ -7305,6 +7305,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 importColumnMerchantContains: 'Sprzedawca zawiera',
                 importColumnUpdatedMerchant: 'Zaktualizowany sprzedawca',
                 importColumnUpdatedCategory: 'Zaktualizowana kategoria',
+                importColumnUpdatedTag: 'Zaktualizowany tag',
                 importColumnUpdatedDescription: 'Zaktualizowany opis',
                 expensesWith: 'Dla wydatków z:',
                 expensesExactlyMatching: 'Dla wydatków dokładnie pasujących do:',
