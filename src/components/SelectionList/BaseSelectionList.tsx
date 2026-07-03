@@ -202,7 +202,11 @@ function BaseSelectionList<TItem extends ListItem>({
                 }
             }
             if (shouldUpdateFocusedIndex && typeof indexToFocus === 'number') {
-                setFocusedIndex(indexToFocus);
+                // On searchable lists that return DOM focus to the search input after a row press (shouldPreventDefaultFocusOnSelectRow),
+                // pinning the pressed row would leave an invisible focused row — a press never sets isKeyboardNavigating, so there is no
+                // highlight — that keeps the plain-Enter shortcut active and stops Enter from reaching the footer's confirm button.
+                // Keep the internal cursor consistent with what the user sees instead. See https://github.com/Expensify/App/issues/92803.
+                setFocusedIndex(shouldShowTextInput && shouldPreventDefaultFocusOnSelectRow ? -1 : indexToFocus);
             }
             onSelectRow(item);
 
