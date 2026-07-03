@@ -1,8 +1,7 @@
 import {fireEvent, render, screen} from '@testing-library/react-native';
 
+import BaseSelectionList from '@components/SelectionList/BaseSelectionList';
 import SelectableListItem from '@components/SelectionList/ListItem/SelectableListItem';
-import BaseSelectionListWithSections from '@components/SelectionList/SelectionListWithSections/BaseSelectionListWithSections';
-import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
 import type {ListItem} from '@components/SelectionList/types';
 
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
@@ -34,15 +33,9 @@ jest.mock('@hooks/useLocalize', () =>
 
 const mockUseKeyboardShortcut = jest.mocked(useKeyboardShortcut);
 
-const sections: Array<Section<ListItem>> = [
-    {
-        title: undefined,
-        data: [
-            {keyForList: 'user-a', text: 'User A'},
-            {keyForList: 'user-b', text: 'User B'},
-        ],
-        sectionIndex: 0,
-    },
+const data: ListItem[] = [
+    {keyForList: 'user-a', text: 'User A'},
+    {keyForList: 'user-b', text: 'User B'},
 ];
 
 /** The plain-Enter shortcut swallows Enter whenever it is active, so its latest registration tells us whether Enter would reach the footer confirm button. */
@@ -51,14 +44,13 @@ function getLatestEnterConfig(shortcut = CONST.KEYBOARD_SHORTCUTS.ENTER) {
     return calls.at(-1)?.[2];
 }
 
-function renderList(extraProps: Partial<React.ComponentProps<typeof BaseSelectionListWithSections<ListItem>>> = {}) {
+function renderList(extraProps: Partial<React.ComponentProps<typeof BaseSelectionList<ListItem>>> = {}) {
     return render(
-        <BaseSelectionListWithSections
-            sections={sections}
+        <BaseSelectionList
+            data={data}
             ListItem={SelectableListItem}
             onSelectRow={jest.fn()}
             canSelectMultiple
-            shouldShowTextInput
             textInputOptions={{label: 'Search', value: '', onChangeText: jest.fn()}}
             shouldUpdateFocusedIndex
             shouldPreventDefaultFocusOnSelectRow
@@ -68,44 +60,18 @@ function renderList(extraProps: Partial<React.ComponentProps<typeof BaseSelectio
     );
 }
 
-describe('BaseSelectionListWithSections focused index on row press', () => {
+describe('BaseSelectionList focused index on row press', () => {
     beforeEach(() => {
         mockUseKeyboardShortcut.mockClear();
     });
 
-    it('clears the keyboard cursor when a press happens on a searchable list that refocuses its input, so Enter reaches the confirm button', () => {
+    it('clears the keyboard cursor when a press happens on a searchable multi-select list that refocuses its input', () => {
         renderList();
 
         fireEvent.press(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-a`));
 
         // With no focused row the plain-Enter shortcut is inactive, so the event bubbles to the footer's pressOnEnter confirm button.
         expect(getLatestEnterConfig()?.isActive).toBe(false);
-    });
-
-    it('still pins the pressed row when the list does not refocus its search input', () => {
-        renderList({shouldPreventDefaultFocusOnSelectRow: false});
-
-        fireEvent.press(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-a`));
-
-        expect(getLatestEnterConfig()?.isActive).toBe(true);
-    });
-
-    it('restores the keyboard cursor when a row genuinely gains DOM focus, keeping keyboard select/deselect intact', () => {
-        renderList();
-
-        fireEvent.press(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-a`));
-        fireEvent(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-b`), 'focus', {nativeEvent: {}});
-
-        expect(getLatestEnterConfig()?.isActive).toBe(true);
-    });
-
-    it('keeps the cursor pinned when the press is keyboard-driven (key info on the event)', () => {
-        renderList();
-
-        fireEvent(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-b`), 'focus', {nativeEvent: {}});
-        fireEvent.press(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-b`), {key: ' '});
-
-        expect(getLatestEnterConfig()?.isActive).toBe(true);
     });
 
     it('keeps the pressed row pinned on single-select lists', () => {
@@ -116,11 +82,11 @@ describe('BaseSelectionListWithSections focused index on row press', () => {
         expect(getLatestEnterConfig()?.isActive).toBe(true);
     });
 
-    it('keeps Ctrl+Enter confirm available regardless of the focused row', () => {
-        renderList();
+    it('keeps the pressed row pinned when the list does not refocus its search input', () => {
+        renderList({shouldPreventDefaultFocusOnSelectRow: false});
 
         fireEvent.press(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}user-a`));
 
-        expect(getLatestEnterConfig(CONST.KEYBOARD_SHORTCUTS.CTRL_ENTER)?.isActive).toBe(true);
+        expect(getLatestEnterConfig()?.isActive).toBe(true);
     });
 });

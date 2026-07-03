@@ -78,11 +78,14 @@ function ListItemRenderer<TItem extends ListItem>({
                 showTooltip={showTooltip}
                 canSelectMultiple={canSelectMultiple}
                 onLongPressRow={onLongPressRow}
-                onSelectRow={() => {
+                onSelectRow={(_pressedItem, _transactionPreviewData, event) => {
+                    // Keyboard-driven presses (Enter or Space on a focused row) carry key info on the event.
+                    // Only a genuine pointer press should be treated as one when moving the focused index.
+                    const indexToFocus = event && 'key' in event ? undefined : index;
                     if (shouldSingleExecuteRowSelect) {
-                        singleExecution(() => selectRow(item, index))();
+                        singleExecution(() => selectRow(item, indexToFocus))();
                     } else {
-                        selectRow(item, index);
+                        selectRow(item, indexToFocus);
                     }
                 }}
                 onSelectionButtonPress={handleOnSelectionButtonPress()}
